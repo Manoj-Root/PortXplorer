@@ -69,6 +69,6 @@ Manoj Kumar S
 
 📜 License
 
-⚠️ This project is currently proprietary — all rights reserved.
-If you wish to use or contribute, please contact the author.
+⚠️ This project is currently proprietary — all rights reserved, but you are welcome to use the tool for personal or educational purposes.
+If you wish to contribute or use it in any other way, please contact the author.
 
