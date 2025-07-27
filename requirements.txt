@@ -1,0 +1,4 @@
+tkinter
+requests
+python-nmap
+reportlab
