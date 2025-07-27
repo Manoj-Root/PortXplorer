@@ -16,6 +16,7 @@ from reportlab.lib.utils import simpleSplit
 from datetime import datetime
 import requests
 import nmap
+import shutil
 
 
 # Globals
@@ -36,10 +37,17 @@ COMMON_PORTS = {
 scan_results = []  # Global variable to store results
 
 def nmap_vulnerability_scan(target):
+    if not shutil.which("nmap"):
+        return "Nmap is not installed or not found in PATH."
     try:
-        command = f"nmap --script vuln {target}"
-        result = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT, text=True)
+        command = ["nmap", "--script", "vuln", target]
+        result = subprocess.check_output(command, stderr=subprocess.STDOUT, text=True, timeout=60)
+        # Truncate output for messagebox
+        if len(result) > 2000:
+            return result[:2000] + "\n\n[Output truncated. See terminal for full results.]"
         return result
+    except subprocess.TimeoutExpired:
+        return "Nmap scan timed out."
     except subprocess.CalledProcessError as e:
         return f"Error during Nmap execution: {e.output}"
     except Exception as e:
@@ -51,11 +59,19 @@ def display_vulnerabilities():
     if not target:
         messagebox.showerror("Error", "Enter a valid IP or URL for vulnerabilities.")
         return
-    try:
-        vulnerabilities = nmap_vulnerability_scan(target)
-        messagebox.showinfo("Vulnerability Info", f"Target: {target}\nVulnerabilities:\n{vulnerabilities}")
-    except Exception as e:
-        messagebox.showerror("Error", f"Failed to fetch vulnerabilities: {e}")
+
+    def run_scan():
+        try:
+            vulnerabilities = nmap_vulnerability_scan(target)
+            print(vulnerabilities)  # Print full output to terminal
+            root.after(0, lambda: messagebox.showinfo(
+                "Vulnerability Info",
+                f"Target: {target}\n\n{vulnerabilities}\n\n[See terminal for full output.]"
+            ))
+        except Exception as e:
+            root.after(0, lambda: messagebox.showerror("Error", f"Failed to fetch vulnerabilities: {e}"))
+
+    threading.Thread(target=run_scan, daemon=True).start()
 
 
 # Function to fetch geolocation data
@@ -373,5 +389,9 @@ tk.Button(
     relief="flat",
     width=20,
 ).pack(side="right", padx=10)
+
+# Check for Nmap installation
+if not shutil.which("nmap"):
+    messagebox.showerror("Error", "Nmap is not installed or not found in PATH.")
 
 root.mainloop()
