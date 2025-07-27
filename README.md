@@ -10,6 +10,9 @@ PortXplorer is a port scanning and vulnerability detection tool designed to help
 - Geolocation information retrieval for IP addresses.
 - PDF report generation for scan results.
 
+## Screenshot
+![PortXplorer UI - 1](screenshot/PortXplorer.png)
+
 ## Installation
 
 To get started with PortXplorer, follow these steps:
